@@ -1,0 +1,89 @@
+networks: # this config is based on the default created local kubernetes network
+  public:
+    driver: bridge
+    external: true
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16
+          gateway: 172.19.0.1
+
+# based on https://github.com/k3s-io/k3s/blob/master/docker-compose.yml
+services:
+  # docs: https://docs.k3s.io/cli/server
+  kubernetes-server:
+    image: "rancher/k3s:${K3S_VERSION:-latest}"
+    command: server
+    hostname: "kubernetes.default"
+    tmpfs:
+      - /run
+      - /var/run
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    privileged: true
+    restart: always
+    environment:
+      - K3S_TOKEN=test
+      - K3S_KUBECONFIG_OUTPUT=/output/kubeconfig.yaml
+      - K3S_KUBECONFIG_MODE=666
+    volumes:
+      - kubernetes-server:/var/lib/rancher/k3s
+      - ./registries.yaml:/etc/rancher/k3s/registries.yaml
+      # This is just so that we get the kubeconfig file out
+      - ./target:/output
+    ports:
+      - 6443:6443  # Kubernetes API Server
+      - 80:80      # Ingress controller port 80
+      - 443:443    # Ingress controller port 443
+    healthcheck:
+      test: [ "CMD-SHELL", "kubectl get pods" ]
+      interval: 1s
+      timeout: 1s
+      retries: 1000
+    networks:
+      public:
+        ipv4_address: 172.19.0.2
+
+  # docs: https://docs.k3s.io/cli/agent
+  kubernetes-agent:
+    image: "rancher/k3s:${K3S_VERSION:-latest}"
+    tmpfs:
+      - /run
+      - /var/run
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    privileged: true
+    restart: always
+    environment:
+      - K3S_URL=https://kubernetes-server:6443
+      - K3S_TOKEN=test
+    volumes:
+      - kubernetes-agent:/var/lib/rancher/k3s
+      - ./registries.yaml:/etc/rancher/k3s/registries.yaml
+    depends_on:
+      kubernetes-server:
+        condition: service_healthy
+    networks:
+      public:
+        ipv4_address: 172.19.0.3
+
+  # docs: https://github.com/GerritForge/docker-registry/blob/master/docs/index.md
+  local-registry:
+    image: "registry:${REGISTRY_VERSION:-latest}"
+    ports:
+      - "5000:5000"
+    volumes:
+      - local-registry:/var/lib/registry
+    networks:
+      public:
+        ipv4_address: 172.19.0.4 # ip used in registries.yaml
+
+volumes:
+  kubernetes-server: { }
+  kubernetes-agent: { }
+  local-registry: { }
