@@ -6,6 +6,8 @@ networks: # this config is based on the default created local kubernetes network
       config:
         - subnet: 172.19.0.0/16
           gateway: 172.19.0.1
+          aux_addresses:
+            "kubernetes.default": "172.19.0.2"
 
 # based on https://github.com/k3s-io/k3s/blob/master/docker-compose.yml
 services:

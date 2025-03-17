@@ -33,7 +33,8 @@ export REGISTRY_VERSION=2.8.3
 
 (
   cd "${PROJECT}"
-  mkdir target
+  mkdir -p target
+  rm -f target/config
 
   # start the local kubernetes cluster
   docker_compose up "${COMPOSE_FLAGS[@]}"

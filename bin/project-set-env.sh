@@ -68,3 +68,5 @@ fi
 
 export PS1="${PROJECT_NAME}:\W \u\$ "
 echo -n -e "\033]0;${PROJECT_NAME}\a"
+
+alias k="${PROJECT_BIN}/kubectl.sh"
