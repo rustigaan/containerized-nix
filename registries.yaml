@@ -1,6 +1,0 @@
-# docs: https://docs.k3s.io/installation/private-registry
-# make the local-registry available in the cluster
-mirrors:
-  "local-registry:5000":
-    endpoint:
-      - http://172.19.0.4:5000 # ip 172.19.0.4 = local-registry, defined in docker-compose.yaml
