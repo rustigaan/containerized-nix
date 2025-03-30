@@ -25,5 +25,13 @@ spec:
             - sh
             - -c
             - "while true ; do sleep 5 ; date ; done"
+          volumeMounts:
+            - mountPath: /Users/jeroen
+              name: host-home
           securityContext:
             privileged: true
+      volumes:
+        - name: host-home
+          hostPath:
+            path: "/Users/jeroen"
+            type: Directory

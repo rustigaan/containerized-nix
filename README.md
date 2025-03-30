@@ -1,3 +1,4 @@
-# nix-k3s-rancher
+# containerized-nix
 
-Run Nix locally in K3s on Rancher
+Run Nix locally in a container.
+

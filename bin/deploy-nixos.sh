@@ -7,15 +7,15 @@ PROJECT="$(dirname "${BIN}")"
 
 source "${BIN}/lib-verbose.sh"
 
-function k() {
-  "${BIN}/kubectl.sh" "$@"
-}
+VOLUME_NAME='nix-store'
+VOLUME="$(docker volume ls --filter name="^${VOLUME_NAME}\$" --format '{{.Name}}')"
+if [[ -z "${VOLUME}" ]]
+then
+  docker volume create "${VOLUME_NAME}"
+  docker run --rm -v "${VOLUME_NAME}:/mnt/nix" nixpkgs/nix-flakes bash -c 'tar -C /nix -cf - . | tar -C /mnt/nix --mode ug+rw -xvf -'
+fi
 
-function helm() {
-  COMMAND=(k "${FLAGS_INHERIT[@]}" -c helm "$@")
-  log "Command: [${COMMAND[*]}]"
-  "${COMMAND[@]}"
-}
-
-helm template nixos "${PROJECT}/helm/nixos" -f "${PROJECT}/helm/nixos/values.yaml" -f "${PROJECT}/helm/nixos/values/${K_ENV}.yaml" \
-  | k apply -f -
+(
+  cd "${PROJECT}"
+  docker compose up
+)
