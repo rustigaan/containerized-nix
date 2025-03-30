@@ -14,7 +14,7 @@ services:
     restart: always
     volumes:
       - nix-store:/nix
-      - /Users/jeroen/src:/Users/jeroen/src
+      - ${HOME}:${HOME}
 
 volumes:
   nix-store:
