@@ -28,6 +28,6 @@ then
 fi
 
 (
-  cd "${PROJECT}"
+  cd "${PROJECT}/docker-compose/containerized-nix"
   docker compose up "${COMPOSE_ARGS[@]}"
 )
