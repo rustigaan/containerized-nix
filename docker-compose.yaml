@@ -1,5 +1,6 @@
 services:
   nix-flakes:
+    container_name: nix
     image: "nixpkgs/nix-flakes"
     command:
       - bash

@@ -7,6 +7,18 @@ PROJECT="$(dirname "${BIN}")"
 
 source "${BIN}/lib-verbose.sh"
 
+DETACH='true'
+if [[ ".$1" = '.--attach' ]]
+then
+  DETACH='false'
+fi
+
+COMPOSE_ARGS=()
+if "${DETACH}"
+then
+  COMPOSE_ARGS+=(--detach)
+fi
+
 VOLUME_NAME='nix-store'
 VOLUME="$(docker volume ls --filter name="^${VOLUME_NAME}\$" --format '{{.Name}}')"
 if [[ -z "${VOLUME}" ]]
@@ -17,5 +29,5 @@ fi
 
 (
   cd "${PROJECT}"
-  docker compose up
+  docker compose up "${COMPOSE_ARGS[@]}"
 )
