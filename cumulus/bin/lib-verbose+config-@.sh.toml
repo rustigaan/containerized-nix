@@ -1,2 +1,2 @@
 write-mode = "WriteNew"
-executable = false
+executable = "false"
